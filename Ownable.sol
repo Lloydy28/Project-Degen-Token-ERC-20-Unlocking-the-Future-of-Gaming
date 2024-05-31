@@ -20,7 +20,7 @@ contract Ownable {
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0), "Ownable: new owner is the zero address");
         emit OwnershipTransferred(kent, newOwner);
-        kent = newOwner;
+        newowner = newOwner;
     }
 
     function cancelTransfer() public onlyOwner {
