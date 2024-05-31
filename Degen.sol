@@ -6,42 +6,46 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contr
 import "./ownable.sol";
 
 contract Skills is ERC20, Ownable {
-    mapping(uint256 => uint256) public skillPurchase;
+    mapping(uint256 => uint256) public skillPrices;
 
-    event ItemRedeemed(address indexed player, uint256 indexed skillId, uint256 Gold);
+    event ItemRedeemed(address indexed player, uint256 indexed skillId, uint256 goldAmount);
 
-    constructor(uint256 initialSupply) ERC20("Degen", "DGN") 
-    {
+    constructor(uint256 initialSupply) ERC20("Degen", "DGN") {
         _mint(msg.sender, initialSupply * 10 ** decimals());
-        // skill 1: Passive Skill - Price: 500 Gold
-        skillPurchase[1] = 500; 
-        // skill 2: Basic Skill - Price: 1000 Gold
-        skillPurchase[2] = 1000; 
-        // skill 3: Intermediate Skill - Price: 2000 Gold
-        skillPurchase[3] = 2000; 
-        // skill 4: Rare Skill - Price: 3500 Gold
-        skillPurchase[4] = 3500; 
-        // Skill 5: Ultimate Skill - Price: 6000 Gold
-        skillPurchase[5] = 6000; 
+        // skill prices and skill desciprtion 
+
+        // Passive Skill 500 gold
+        skillPrices[1] = 500;
+        // Basic Skill 1000 gold
+        skillPrices[2] = 1000; 
+        // Intermediate Skill 2000 gold
+        skillPrices[3] = 2000;
+        // Rare Skill 3500 gold 
+        skillPrices[4] = 3500;
+         // Ultimate Skill 6000 gold 
+        skillPrices[5] = 6000;
     }
 
-    function mint(address account, uint256 Gold) public onlyOwner {
-        _mint(account, Gold);
+    function mint(address account, uint256 goldAmount) public onlyOwner 
+    {
+        _mint(account, goldAmount);
     }
 
-    function burn(uint256 Gold) external {
-        _burn(msg.sender, Gold);
+    function burn(uint256 goldAmount) external
+     {
+        _burn(msg.sender, goldAmount);
     }
 
-    function Skill(uint256 skillId, uint256 Gold) external  {
-        skillPurchase[skillId] = Gold;
+    function setSkillPrice(uint256 skillId, uint256 goldAmount) external onlyOwner {
+        skillPrices[skillId] = goldAmount;
     }
 
-    function SkillId(uint256 skillId) external {
-        require(skillPurchase[skillId] > 0, "Skill id purchace not enough ");
-        require(balanceOf(msg.sender) >= skillPurchase[skillId], "Gold is not enough");
+    function redeemSkill(uint256 skillId) external {
+        uint256 price = skillPrices[skillId];
+        require(price > 0, "Invalid skill ID or skill not for sale");
+        require(balanceOf(msg.sender) >= price, "Insufficient Gold");
 
-        _transfer(msg.sender, kent, skillPurchase[skillId]);
-        emit ItemRedeemed(msg.sender, skillId, skillPurchase[skillId]);
+        _transfer(msg.sender, kent, price); // Transfer Gold to the owner
+        emit ItemRedeemed(msg.sender, skillId, price);
     }
 }
